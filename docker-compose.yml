@@ -1,51 +1,21 @@
-version: "3.8"
-
 services:
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
+  mysql:
+    image: mysql:9.1
     ports:
-      - "8080:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - ./jenkins/init.groovy.d:/var/jenkins_home/init.groovy.d
-    networks:
-      - monitoring-network
-
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - monitoring-network
-    depends_on:
-      - jenkins
-
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    networks:
-      - monitoring-network
-    depends_on:
-      - prometheus
+      - "3306:3306"
     environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USERNAME:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-
-networks:
-  monitoring-network:
-    driver: bridge
-
-volumes:
-  jenkins_home:
-  grafana_data:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_USER=petclinic
+      - MYSQL_PASSWORD=petclinic
+      - MYSQL_DATABASE=petclinic
+    volumes:
+      - "./conf.d:/etc/mysql/conf.d:ro"
+  postgres:
+    image: postgres:17.0
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=petclinic
+      - POSTGRES_USER=petclinic
+      - POSTGRES_DB=petclinic
