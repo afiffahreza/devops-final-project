@@ -55,6 +55,10 @@ if (!existingJob) {
 
     def definition = new CpsScmFlowDefinition(scm, "devopspipeline/jenkins/Jenkinsfile")
     job.setDefinition(definition)
+    
+    def scmTrigger = new SCMTrigger("* * * * *")
+    job.addTrigger(scmTrigger)
+    job.setQuietPeriod(0)
     job.save()
 
     println "--> Job '${jobName}' created successfully"
