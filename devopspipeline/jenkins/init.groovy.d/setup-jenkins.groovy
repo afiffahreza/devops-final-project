@@ -1,12 +1,22 @@
 import jenkins.model.*
 import hudson.security.*
 import java.util.logging.Logger
+import jenkins.model.Jenkins
+import jenkins.install.InstallState
 
 def logger = Logger.getLogger("")
 def jenkins = Jenkins.getInstance()
 
 def adminUsername = System.getenv('JENKINS_ADMIN_USERNAME') ?: 'admin'
 def adminPassword = System.getenv('JENKINS_ADMIN_PASSWORD') ?: 'admin'
+
+
+
+println "--> Loaded Jenkins plugins:"
+Jenkins.instance.pluginManager.plugins.each { plugin ->
+    println "    ${plugin.getShortName()} (${plugin.getVersion()})"
+}
+
 
 // Explicitly create admin user
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
@@ -33,28 +43,12 @@ try {
     logger.warning("Could not complete setup wizard: ${e.message}")
 }
 
-// Install Prometheus plugin
-def pluginManager = jenkins.getPluginManager()
-def updateCenter = jenkins.getUpdateCenter()
-
-if (!pluginManager.getPlugin("prometheus")) {
-    updateCenter.updateAllSites()
-    def prometheusPlugin = updateCenter.getPlugin("prometheus")
-    
-    if (prometheusPlugin) {
-        try {
-            def installFuture = prometheusPlugin.deploy()
-            installFuture.get()
-            jenkins.save()
-            logger.info("Prometheus plugin installed successfully")
-        } catch (Exception e) {
-            logger.severe("Failed to install Prometheus plugin: ${e.message}")
-        }
-    } else {
-        logger.info("Could not find Prometheus plugin in update center")
-    }
+def workflowScript = new File("/var/jenkins_home/workflows/gh_pipeline.groovy")
+if (workflowScript.exists()) {
+    println "--> Loading job workflows from: ${workflowScript}"
+    evaluate workflowScript
 } else {
-    logger.info("Prometheus plugin already installed")
+    println "--> No workflow job script found"
 }
 
 // Save configuration changes

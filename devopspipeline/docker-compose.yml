@@ -1,8 +1,8 @@
-version: "3.8"
-
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: jenkins/jenkins.Dockerfile
     container_name: jenkins
     ports:
       - "8080:8080"
@@ -10,8 +10,12 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - ./jenkins/init.groovy.d:/var/jenkins_home/init.groovy.d
+      - ./jenkins/workflows:/var/jenkins_home/workflows
     networks:
       - monitoring-network
+    environment:
+      GH_REPO_URL: ${GH_REPO_URL}
+      GH_DEPLOY_KEY: ${GH_DEPLOY_KEY}
 
   prometheus:
     image: prom/prometheus

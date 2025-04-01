@@ -1,0 +1,42 @@
+pipeline {
+  agent any
+
+  environment {
+    NODE_ENV = 'production'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Build') {
+      steps {
+        echo "Building the project"
+      }
+    }
+
+    stage('Test') {
+      steps {
+        echo "Running tests"
+      }
+    }
+
+    stage('Deploy') {
+      when {
+        branch 'master'
+      }
+      steps {
+        echo "Deploying to production..."
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Cleaning up..."
+    }
+  }
+}

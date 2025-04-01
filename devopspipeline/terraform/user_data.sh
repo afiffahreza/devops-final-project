@@ -10,13 +10,16 @@ docker-compose version
 systemctl start docker
 systemctl enable docker
 
+export GH_DEPLOY_KEY=$(echo "${GH_DEPLOY_KEY}")
+export GH_REPO_URL=$(echo "${GH_REPO_URL}")
+
 mkdir -p /root/.ssh
-echo "${GH_DEPLOY_KEY}" | base64 --decode > /root/.ssh/id_rsa
+echo "$GH_DEPLOY_KEY" | base64 --decode > /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
 
 ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-git clone ${GH_REPO_URL} /opt/devops-final-project
+git clone $GH_REPO_URL /opt/devops-final-project
 
 cd /opt/devops-final-project/devopspipeline
 sudo docker-compose up -d
