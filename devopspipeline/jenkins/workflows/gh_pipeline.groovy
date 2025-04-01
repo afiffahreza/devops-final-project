@@ -8,6 +8,7 @@ import com.cloudbees.plugins.credentials.CredentialsScope
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider
 import com.cloudbees.plugins.credentials.domains.Domain
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey
+import hudson.triggers.SCMTrigger
 
 def GH_REPO_URL = System.getenv("GH_REPO_URL")
 def GH_DEPLOY_KEY = new String(System.getenv("GH_DEPLOY_KEY").decodeBase64())
@@ -56,6 +57,8 @@ if (!existingJob) {
     def definition = new CpsScmFlowDefinition(scm, "devopspipeline/jenkins/Jenkinsfile")
     job.setDefinition(definition)
     
+    // Polling webhook
+    // job.addTrigger(new GitHubPushTrigger())
     def scmTrigger = new SCMTrigger("* * * * *")
     job.addTrigger(scmTrigger)
     job.setQuietPeriod(0)

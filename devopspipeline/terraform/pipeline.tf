@@ -11,6 +11,10 @@ variable "GH_REPO_URL" {
   type = string
 }
 
+variable "AWS_EIP" {
+  type = string
+}
+
 resource "aws_security_group" "pipeline_sg" {
   name        = "open-ports"
   description = "Open ports"
@@ -58,6 +62,12 @@ resource "aws_instance" "pipeline" {
     GH_REPO_URL   = var.GH_REPO_URL
   })
 }
+
+# Polling webhook
+# resource "aws_eip_association" "jenkins_ip_assoc" {
+#   instance_id   = aws_instance.pipeline.id
+#   allocation_id = var.AWS_EIP
+# }
 
 resource "aws_instance" "prod" {
   ami           = "ami-0efc43a4067fe9a3e"

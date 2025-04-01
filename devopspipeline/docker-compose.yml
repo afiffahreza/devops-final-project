@@ -5,6 +5,10 @@ services:
       dockerfile: jenkins/jenkins.Dockerfile
     env_file:
       - /opt/env/.env
+    # Replace with this if running locally
+    # environment:
+    #   GH_REPO_URL: ${GH_REPO_URL}
+    #   GH_DEPLOY_KEY: ${GH_DEPLOY_KEY}
     container_name: jenkins
     ports:
       - "8080:8080"
