@@ -4,6 +4,7 @@ provider "aws" {
 
 variable "GH_DEPLOY_KEY" {
   type = string
+  sensitive = true
 }
 
 variable "GH_REPO_URL" {
@@ -15,9 +16,25 @@ resource "aws_security_group" "pipeline_sg" {
   description = "Open ports"
 
   ingress {
-    description = "HTTP app on 8080"
+    description = "Grafana"
     from_port   = 3000
     to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Jenkins"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+    ingress {
+    description = "Debug SSH"
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

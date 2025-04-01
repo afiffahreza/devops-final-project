@@ -21,5 +21,8 @@ ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 git clone $GH_REPO_URL /opt/devops-final-project
 
+echo "GH_DEPLOY_KEY=${GH_DEPLOY_KEY}" >> /opt/env/.env
+echo "GH_REPO_URL=${GH_REPO_URL}" >> /opt/env/.env
+
 cd /opt/devops-final-project/devopspipeline
 sudo docker-compose up -d
