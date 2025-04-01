@@ -15,9 +15,6 @@ services:
       - ./jenkins/workflows:/var/jenkins_home/workflows
     networks:
       - monitoring-network
-    environment:
-      GH_REPO_URL: ${GH_REPO_URL}
-      GH_DEPLOY_KEY: ${GH_DEPLOY_KEY}
 
   prometheus:
     image: prom/prometheus
