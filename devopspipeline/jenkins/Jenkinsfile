@@ -3,6 +3,7 @@ pipeline {
 
   environment {
     NODE_ENV = 'production'
+    MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
   }
 
   stages {
@@ -14,13 +15,15 @@ pipeline {
 
     stage('Build') {
       steps {
-        echo "Building the project"
+        echo "Building project"
+        sh 'mvn clean compile | tee logs/mvn-build.log'
       }
     }
 
     stage('Test') {
       steps {
         echo "Running tests"
+        sh 'mvn test | tee logs/mvn-test.log'
       }
     }
 
@@ -29,14 +32,37 @@ pipeline {
         branch 'master'
       }
       steps {
-        echo "Deploying to production..."
+        echo "Deploying to production"
       }
     }
   }
 
   post {
     always {
-      echo "Cleaning up..."
+      echo "Cleaning up"
+
+      archiveArtifacts artifacts: 'logs/*.log', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'target/surefire-reports/**', allowEmptyArchive: true
+
+      sh '''
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        JOB_NAME=$(echo "$JOB_NAME" | tr '/' '_')
+
+        AWS_BUCKET_NAME=17636-devsecops-g2loggingbucket
+        AWS_PATH="jenkins-logs/$JOB_NAME/$BUILD_NUMBER-$TIMESTAMP"
+
+        if [ -d logs ]; then
+          aws s3 cp logs/ s3://$AWS_BUCKET_NAME/$AWS_PATH/logs/ --recursive
+        fi
+
+        if [ -d target/surefire-reports ]; then
+          aws s3 cp target/surefire-reports/ s3://$AWS_BUCKET_NAME/$AWS_PATH/surefire-reports/ --recursive
+        fi
+      '''
+    }
+
+    failure {
+      echo "Build or test failure."
     }
   }
 }
