@@ -36,5 +36,14 @@ Enter yes when you need to, and remember to run `destory_pipeline.sh` afterwards
 If you want to ssh into the EC2 to debug, look at /var/log/cloud-init-output.log
 Edit pipeline.tf to add more ports when needed
 
+Troubleshooting:
+- SSH into the pipeline EC2, cd to /opt/devops-final-project/devopspipeline
+- docker-compose logs <service name, e.g. jenkins>
+
+- If you don't see any jobs on the jenkins UI, it's probably because the jenkins scripts to initialize jobs failed
+- It takes a while for jenkins to start
+
+
+
 
 
