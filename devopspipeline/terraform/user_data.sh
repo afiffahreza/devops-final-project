@@ -3,14 +3,6 @@ dnf update -y
 dnf install -y git
 dnf install -y docker
 
-# Java
-rpm --import https://yum.corretto.aws/corretto.key
-curl -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
-
-dnf install -y maven
-
-dnf install -y java-21-amazon-corretto
-
 # Docker Compose
 sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
