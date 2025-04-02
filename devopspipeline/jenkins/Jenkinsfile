@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    NODE_ENV = 'production'
+    NODE_ENV = 'pipeline'
     MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
   }
 
@@ -10,7 +10,7 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
-        mkdir logs
+        sh 'mkdir logs'
       }
     }
 
