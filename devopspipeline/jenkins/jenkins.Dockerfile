@@ -2,16 +2,6 @@ FROM jenkins/jenkins:lts
 
 USER root
 
-RUN curl -L -o /tmp/corretto.tar.gz https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.tar.gz && \
-    mkdir -p /opt/corretto21 && \
-    tar -xzf /tmp/corretto.tar.gz -C /opt/corretto21 --strip-components=1 && \
-    rm /tmp/corretto.tar.gz
-
-ENV JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
-ENV PATH="$JAVA_HOME/bin:$PATH"
-
-RUN apt-get install maven
-
 # Add GH key to known hosts
 RUN mkdir -p /var/jenkins_home/.ssh && \
     ssh-keyscan github.com >> /var/jenkins_home/.ssh/known_hosts && \
@@ -20,6 +10,16 @@ RUN mkdir -p /var/jenkins_home/.ssh && \
 
 COPY jenkins/plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
+
+ENV MAVEN_VERSION=3.9.6
+ENV MAVEN_HOME=/opt/maven
+
+RUN curl -fsSL https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz -o /tmp/maven.tar.gz && \
+    mkdir -p $MAVEN_HOME && \
+    tar -xzf /tmp/maven.tar.gz -C $MAVEN_HOME --strip-components=1 && \
+    rm /tmp/maven.tar.gz
+
+ENV PATH="$MAVEN_HOME/bin:$PATH"
 
 USER jenkins
 

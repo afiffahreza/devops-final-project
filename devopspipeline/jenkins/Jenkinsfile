@@ -10,7 +10,7 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'mkdir logs'
+        sh 'mkdir -p logs'
       }
     }
 
@@ -43,23 +43,24 @@ pipeline {
       echo "Cleaning up"
 
       archiveArtifacts artifacts: 'logs/*.log', allowEmptyArchive: true
-      archiveArtifacts artifacts: 'target/surefire-reports/**', allowEmptyArchive: true
+    //TODO: Archive artifacts, add AWS-CLI to the jenkins container
+    //   archiveArtifacts artifacts: 'target/surefire-reports/**', allowEmptyArchive: true
 
-      sh '''
-        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        JOB_NAME=$(echo "$JOB_NAME" | tr '/' '_')
+    //   sh '''
+    //     TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+    //     JOB_NAME=$(echo "$JOB_NAME" | tr '/' '_')
 
-        AWS_BUCKET_NAME=17636-devsecops-g2loggingbucket
-        AWS_PATH="jenkins-logs/$JOB_NAME/$BUILD_NUMBER-$TIMESTAMP"
+    //     AWS_BUCKET_NAME=17636-devsecops-g2loggingbucket
+    //     AWS_PATH="jenkins-logs/$JOB_NAME/$BUILD_NUMBER-$TIMESTAMP"
 
-        if [ -d logs ]; then
-          aws s3 cp logs/ s3://$AWS_BUCKET_NAME/$AWS_PATH/logs/ --recursive
-        fi
+    //     if [ -d logs ]; then
+    //       aws s3 cp logs/ s3://$AWS_BUCKET_NAME/$AWS_PATH/logs/ --recursive
+    //     fi
 
-        if [ -d target/surefire-reports ]; then
-          aws s3 cp target/surefire-reports/ s3://$AWS_BUCKET_NAME/$AWS_PATH/surefire-reports/ --recursive
-        fi
-      '''
+    //     if [ -d target/surefire-reports ]; then
+    //       aws s3 cp target/surefire-reports/ s3://$AWS_BUCKET_NAME/$AWS_PATH/surefire-reports/ --recursive
+    //     fi
+    //   '''
     }
 
     failure {
