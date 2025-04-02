@@ -10,6 +10,8 @@ RUN curl -L -o /tmp/corretto.tar.gz https://corretto.aws/downloads/latest/amazon
 ENV JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
+RUN apt-get install maven
+
 # Add GH key to known hosts
 RUN mkdir -p /var/jenkins_home/.ssh && \
     ssh-keyscan github.com >> /var/jenkins_home/.ssh/known_hosts && \
