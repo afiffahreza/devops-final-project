@@ -19,6 +19,14 @@ RUN curl -fsSL https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binar
     tar -xzf /tmp/maven.tar.gz -C $MAVEN_HOME --strip-components=1 && \
     rm /tmp/maven.tar.gz
 
+# Install ZAP CLI
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv pipx && \
+    pipx ensurepath && \
+    pipx install zapcli && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ENV PATH="$MAVEN_HOME/bin:$PATH"
 
 USER jenkins
