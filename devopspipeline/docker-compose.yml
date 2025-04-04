@@ -17,6 +17,8 @@ services:
       - jenkins_home:/var/jenkins_home
       - ./jenkins/init.groovy.d:/var/jenkins_home/init.groovy.d
       - ./jenkins/workflows:/var/jenkins_home/workflows
+      # Allow Jenkins to talk to host Docker daemon to run docker exec
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - monitoring-network
 
@@ -49,6 +51,17 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
 
+  zap:
+    image: zaproxy/zap-stable
+    container_name: zap
+    command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
+    ports:
+      - "8090:8090"
+    volumes:
+      - zap_data:/zap/wrk
+    networks:
+      - monitoring-network
+
 networks:
   monitoring-network:
     driver: bridge
@@ -56,3 +69,4 @@ networks:
 volumes:
   jenkins_home:
   grafana_data:
+  zap_data:

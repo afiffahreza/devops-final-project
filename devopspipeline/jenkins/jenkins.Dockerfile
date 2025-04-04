@@ -19,6 +19,10 @@ RUN curl -fsSL https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binar
     tar -xzf /tmp/maven.tar.gz -C $MAVEN_HOME --strip-components=1 && \
     rm /tmp/maven.tar.gz
 
+    # Install Docker CLI so Jenkins can run docker exec/run
+RUN apt-get update && apt-get install -y docker.io
+
+
 # Install ZAP CLI
 RUN apt-get update && \
     apt-get install -y python3 python3-pip python3-venv pipx && \

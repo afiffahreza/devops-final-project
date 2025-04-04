@@ -5,7 +5,7 @@ pipeline {
     NODE_ENV = 'pipeline'
     MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
     APP_PORT = '8081'
-    ZAP_TARGET_URL = "http://localhost:${APP_PORT}"
+    ZAP_TARGET_URL = "http://host.docker.internal:${APP_PORT}"
   }
 
   stages {
@@ -30,38 +30,36 @@ pipeline {
       }
     }
 
-    stage('Start Spring Boot App') {
+    stage('Run App') {
       steps {
-        echo "Starting Spring Boot app"
+        echo "Starting Spring Boot app on port ${APP_PORT}"
         sh '''
-          nohup mvn spring-boot:run > logs/app.log 2>&1 &
+          nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=${APP_PORT} > logs/app.log 2>&1 &
           echo $! > app.pid
         '''
-
         sh '''
           echo "Waiting for app to be available at ${ZAP_TARGET_URL}..."
-          for i in {1..10}; do
+          for i in {1..20}; do
             if curl -s --head --fail ${ZAP_TARGET_URL}; then
               echo "App is up!"
               break
             fi
-            echo "App not up yet, retrying in 5s..."
+            echo "App not up yet, retrying in 5s... ($i/20)"
             sleep 5
           done
         '''
       }
     }
 
-    stage('Security Scan - OWASP ZAP') {
+    stage('Run OWASP ZAP Scan') {
       steps {
-        echo "Running OWASP ZAP security scan"
+        echo "Running ZAP scan from Jenkins against ${ZAP_TARGET_URL}"
         sh '''
-          mkdir -p zap-reports
-          
-          docker exec zap zap-cli -p 8090 open-url ${ZAP_TARGET_URL}
-          docker exec zap zap-cli -p 8090 spider ${ZAP_TARGET_URL}
-          docker exec zap zap-cli -p 8090 active-scan ${ZAP_TARGET_URL}
-          docker exec zap zap-cli -p 8090 report -o /zap/wrk/zap-report.html -f html
+          docker exec zap zap-cli -p ${ZAP_PORT} status -t 60
+          docker exec zap zap-cli -p ${ZAP_PORT} open-url ${ZAP_TARGET_URL}
+          docker exec zap zap-cli -p ${ZAP_PORT} spider ${ZAP_TARGET_URL}
+          docker exec zap zap-cli -p ${ZAP_PORT} active-scan ${ZAP_TARGET_URL}
+          docker exec zap zap-cli -p ${ZAP_PORT} report -o /zap/wrk/zap-report.html -f html
           docker cp zap:/zap/wrk/zap-report.html zap-reports/
         '''
       }
