@@ -44,7 +44,7 @@ pipeline {
           for i in $(seq 1 20); do
             if curl -s --head --fail ${LOCAL_TARGET_URL}; then
               echo "App is up!"
-              break
+              exit 0
             fi
             echo "App not up yet, retrying in 5s... ($i/20)"
             sleep 5
