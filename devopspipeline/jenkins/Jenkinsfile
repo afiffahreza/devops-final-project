@@ -5,7 +5,10 @@ pipeline {
     NODE_ENV = 'pipeline'
     MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
     APP_PORT = '8081'
-    ZAP_TARGET_URL = "http://host.docker.internal:${APP_PORT}"
+    // Used by Jenkins for health checks
+    LOCAL_TARGET_URL = "http://localhost:${APP_PORT}"
+     // Used by ZAP container
+    ZAP_TARGET_URL   = "http://jenkins:8081:${APP_PORT}"
   }
 
   stages {
@@ -34,19 +37,16 @@ pipeline {
       steps {
         echo "Starting Spring Boot app on port ${APP_PORT}"
         sh '''
-          echo "Starting Spring Boot app in background..."
           nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=${APP_PORT} > logs/app.log 2>&1 &
-          APP_PID=$!
-          echo $APP_PID > app.pid
+          echo $! > app.pid
 
-          echo "Waiting for app to be available at ${ZAP_TARGET_URL}..."
-
+          echo "Waiting for app to be available at ${LOCAL_TARGET_URL}..."
           for i in $(seq 1 20); do
-            if curl -s --head --fail ${ZAP_TARGET_URL}; then
-              echo "App is up and responding at ${ZAP_TARGET_URL}"
-              exit 0
+            if curl -s --head --fail ${LOCAL_TARGET_URL}; then
+              echo "App is up!"
+              break
             fi
-            echo "⏳ App not up yet (attempt $i/20), retrying in 5s..."
+            echo "App not up yet, retrying in 5s... ($i/20)"
             sleep 5
           done
 
