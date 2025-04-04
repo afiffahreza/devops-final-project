@@ -1,4 +1,5 @@
 import jenkins.model.*
+import jenkins.install.InstallState
 import hudson.security.*
 import java.util.logging.Logger
 import jenkins.model.Jenkins
@@ -31,7 +32,7 @@ try {
     strategy.setAllowAnonymousRead(false)
     jenkins.setAuthorizationStrategy(strategy)
 
-    logger.info("Admin user created successfully")
+    logger.info("Admin user created successfully with username: ${adminUsername}")
 } catch (Exception e) {
     logger.severe("Failed to create admin user: ${e.message}")
 }
