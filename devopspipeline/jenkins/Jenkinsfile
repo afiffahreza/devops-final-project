@@ -34,20 +34,31 @@ pipeline {
       steps {
         echo "Starting Spring Boot app on port ${APP_PORT}"
         sh '''
+          echo "Starting Spring Boot app in background..."
           nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=${APP_PORT} > logs/app.log 2>&1 &
-          echo $! > app.pid
-        '''
-        sh '''
+          APP_PID=$!
+          echo $APP_PID > app.pid
+
           echo "Waiting for app to be available at ${ZAP_TARGET_URL}..."
+
           for i in $(seq 1 20); do
             if curl -s --head --fail ${ZAP_TARGET_URL}; then
-              echo "App is up!"
+              echo "App is up and responding at ${ZAP_TARGET_URL}"
               exit 0
             fi
-            echo "App not up yet, retrying in 5s... ($i/20)"
+            echo "⏳ App not up yet (attempt $i/20), retrying in 5s..."
             sleep 5
           done
-          echo "App did not start in time."
+
+          echo "App did not start in time after 20 attempts."
+          echo "Dumping logs from logs/app.log:"
+          echo "----------------------------------"
+          cat logs/app.log || echo "No logs found!"
+          echo "----------------------------------"
+
+          echo "🔪 Killing Spring Boot app process if it's still running..."
+          kill $APP_PID || true
+
           exit 1
         '''
       }
