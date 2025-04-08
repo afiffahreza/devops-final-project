@@ -7,3 +7,5 @@ workflow-cps
 workflow-aggregator
 
 prometheus
+
+sonar
