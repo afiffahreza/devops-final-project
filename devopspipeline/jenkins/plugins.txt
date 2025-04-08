@@ -10,3 +10,4 @@ prometheus
 
 sonar
 blueocean
+maven-plugin

@@ -33,7 +33,16 @@ pipeline {
       }
     }
 
-    
+    stage('Run Sonarqube') {
+      environment {
+          scannerHome = tool 'devops-sonar-scanner';
+      }
+      steps {
+        withSonarQubeEnv(credentialsId: 'devops-sonar-credentials', installationName: 'devops-sonar-install') {
+          sh "${scannerHome}/bin/sonar-scanner"
+        }
+      }
+    }
 
     stage('Run App') {
       steps {
