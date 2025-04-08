@@ -33,6 +33,8 @@ pipeline {
       }
     }
 
+    
+
     stage('Run App') {
       steps {
         echo "Starting Spring Boot app on port ${APP_PORT}"

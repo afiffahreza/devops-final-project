@@ -9,3 +9,4 @@ workflow-aggregator
 prometheus
 
 sonar
+blueocean
