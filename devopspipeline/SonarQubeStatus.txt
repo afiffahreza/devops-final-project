@@ -1,0 +1,13 @@
+What has been done:
+ - Added SonarQube to docker-compose
+    - unsure if postgres is necessary down the line, its not required for the image to run
+ - Added SonarQube to Jenkinsfile
+    - will need to be changed when we finally figure out how to get it working
+What has been attempted:
+ - Running SonarQube Locally
+    - Create token on SonarQube
+    - Add token to Jenkins credentials
+    - Add SonarQube and Mavin tools to Jenkins tools
+    - Add SonarQube installation to Jenkins system
+ - Creating Jenkins pipeline using the Jenkinsfile and building
+    - Doesn't work because it requires credentials for the github repo

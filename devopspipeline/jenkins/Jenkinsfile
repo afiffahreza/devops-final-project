@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+  tools {
+    maven 'maven'
+  }
+
   environment {
     NODE_ENV = 'pipeline'
     MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
@@ -14,8 +18,9 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        checkout scm
-        sh 'mkdir -p logs'
+        // checkout scm
+        // sh 'mkdir -p logs'
+        git 'https://github.com/afiffahreza/devops-final-project.git'
       }
     }
 
@@ -35,12 +40,11 @@ pipeline {
 
     stage('Run Sonarqube') {
       environment {
-          scannerHome = tool 'devops-sonar-scanner';
+        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_AUTH_TOKEN = credentials('sonarqube')
       }
       steps {
-        withSonarQubeEnv(credentialsId: 'devops-sonar-credentials', installationName: 'devops-sonar-install') {
-          sh "${scannerHome}/bin/sonar-scanner"
-        }
+        sh 'mvn sonar:sonar -Dsonar.projectKey=devops-final-project -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_AUTH_TOKEN'
       }
     }
 
