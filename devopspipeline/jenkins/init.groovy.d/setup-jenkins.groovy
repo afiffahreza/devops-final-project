@@ -4,6 +4,11 @@ import hudson.security.*
 import java.util.logging.Logger
 import jenkins.model.Jenkins
 import jenkins.install.InstallState
+import hudson.util.Secret
+import com.cloudbees.plugins.credentials.*
+import com.cloudbees.plugins.credentials.domains.*
+import com.cloudbees.plugins.credentials.impl.*
+import groovy.json.JsonSlurper
 
 def logger = Logger.getLogger("")
 def jenkins = Jenkins.getInstance()
@@ -50,6 +55,44 @@ if (workflowScript.exists()) {
     evaluate workflowScript
 } else {
     println "--> No workflow job script found"
+}
+
+def SONARQUBE_URL = "http://sonarqube:9000"
+def ADMIN_USER = "admin"
+def ADMIN_PASS = "DevopsSonar1."
+def TOKEN_NAME = "jenkins-token"
+
+// Wait for SonarQube to be ready
+sleep(20000)
+
+def changePassword = ["bash", "-c", """
+  curl -u admin:admin -X POST http://localhost:9000/api/users/change_password -d "login=admin" -d "previousPassword=admin" -d "password=${ADMIN_PASS}"
+"""]
+
+def tokenJson = ["bash", "-c", """
+  curl -s -u ${ADMIN_USER}:${ADMIN_PASS} -X POST ${SONARQUBE_URL}/api/user_tokens/generate -d "name=${TOKEN_NAME}"
+"""].execute().text
+
+def tokenResp = new JsonSlurper().parseText(tokenJson)
+def token = tokenResp.token
+
+if (token) {
+    println "✅ Token created: ${token}"
+
+    def creds = new StringCredentialsImpl(
+        CredentialsScope.GLOBAL,
+        "sonarqube-token",
+        "Auto-created SonarQube token",
+        Secret.fromString(token)
+    )
+
+    SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), creds)
+    println "🔐 Token added to Jenkins credentials."
+
+    
+
+} else {
+    println "❌ Failed to create token. Response: ${tokenJson}"
 }
 
 // Save configuration changes

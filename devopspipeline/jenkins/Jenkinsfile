@@ -1,9 +1,9 @@
 pipeline {
   agent any
 
-  tools {
-    maven 'maven'
-  }
+  // tools {
+  //   maven 'maven'
+  // }
 
   environment {
     NODE_ENV = 'pipeline'
