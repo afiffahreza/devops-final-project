@@ -8,7 +8,7 @@ pipeline {
     // Used by Jenkins for health checks
     LOCAL_TARGET_URL = "http://localhost:${APP_PORT}"
      // Used by ZAP container
-    ZAP_TARGET_URL   = "http://jenkins:8081:${APP_PORT}"
+    ZAP_TARGET_URL   = "http://jenkins:${APP_PORT}"
   }
 
   stages {
