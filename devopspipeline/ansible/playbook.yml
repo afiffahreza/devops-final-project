@@ -1,0 +1,26 @@
+---
+- name: Clone, build, and run Java application
+  hosts: localhost
+  vars:
+    repo_url: "https://github.com/afiffahreza/devops-final-project.git"
+  tasks:
+    - name: Stop the currently running Java application
+      shell: |
+        pkill -f 'java -jar'
+      ignore_errors: yes
+    - name: Clone the repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "/tmp/repo"
+        update: yes
+    - name: Change directory to the repository and build the project
+      shell: |
+        cd /tmp/repo
+        ./mvnw package
+      args:
+        chdir: /tmp/repo
+    - name: Run the Java application
+      shell: |
+        java -jar target/*.jar
+      args:
+        chdir: /tmp/repo
