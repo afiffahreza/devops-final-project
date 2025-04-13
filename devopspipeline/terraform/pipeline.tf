@@ -2,6 +2,19 @@ provider "aws" {
   region = "us-east-2"
 }
 
+variable "GH_DEPLOY_KEY" {
+  type = string
+  sensitive = true
+}
+
+variable "GH_REPO_URL" {
+  type = string
+}
+
+variable "AWS_EIP" {
+  type = string
+}
+
 resource "aws_security_group" "pipeline_sg" {
   name        = "open-ports"
   description = "Open ports"
@@ -110,19 +123,4 @@ resource "aws_instance" "prod" {
 resource "aws_s3_bucket" "logbucket" {
   bucket        = "17636-devsecops-g2loggingbucket"
   force_destroy = true
-}
-
-resource "tls_private_key" "ssh_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "aws_key_pair" "tf_key" {
-  key_name   = var.KEY_PAIR_NAME
-  public_key = tls_private_key.ssh_key.public_key_openssh
-}
-
-resource "local_file" "private_key" {
-  content  = tls_private_key.ssh_key.private_key_pem
-  filename = var.KEY_PAIR_FILE
 }
