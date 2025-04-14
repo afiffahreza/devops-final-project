@@ -69,7 +69,7 @@ resource "aws_security_group" "prod_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [aws_instance.pipeline.public_ip]
+    cidr_blocks = ["${aws_instance.pipeline.private_ip}/32"]
   }
 
   ingress {
