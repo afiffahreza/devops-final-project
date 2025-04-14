@@ -25,17 +25,18 @@ RUN apt-get update && \
     groupadd docker || true && \
     usermod -aG docker jenkins
 
-# Install ZAP CLI
+# Install Python and pipx
 RUN apt-get update && \
     apt-get install -y python3 python3-pip python3-venv pipx && \
-    pipx ensurepath && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Zap
+RUN pipx ensurepath && \
     pipx install zapcli
 
 # Install Ansible
-RUN apt-get update && \
-    apt-get install -y ansible && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN pipx install --include-deps ansible
 
 ENV PATH="$MAVEN_HOME/bin:$PATH"
 
