@@ -35,5 +35,15 @@ RUN apt-get update && \
 
 ENV PATH="$MAVEN_HOME/bin:$PATH"
 
+# Copy the entrypoint script
+COPY jenkins/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Make the script executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
 USER jenkins
 
+CMD ["/usr/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
