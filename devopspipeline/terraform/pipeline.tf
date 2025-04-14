@@ -17,11 +17,6 @@ variable "AWS_EIP" {
   type = string
 }
 
-variable "SSH_PRIVATE_KEY" {
-  type = string
-  sensitive = true
-}
-
 variable "SSH_PUBLIC_KEY" {
   type = string
 }
@@ -166,8 +161,7 @@ resource "aws_instance" "pipeline" {
 
   user_data = templatefile("${path.module}/user_data.sh", {
     GH_DEPLOY_KEY = var.GH_DEPLOY_KEY,
-    GH_REPO_URL   = var.GH_REPO_URL,
-    SSH_PRIVATE_KEY = var.SSH_PRIVATE_KEY
+    GH_REPO_URL   = var.GH_REPO_URL
   })
 }
 
