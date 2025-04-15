@@ -36,7 +36,7 @@ ENV PATH="/root/.local/bin:$MAVEN_HOME/bin:$PATH"
 
 # Add pipx execution permissions
 RUN mkdir -p /root/.local/bin && \
-    chmod -R 644 /root/.local/bin && \
+    chmod -R 755 /root/.local/bin && \
     chown -R jenkins:jenkins /root/.local/bin
 
 # Ensure pipx in PATH
