@@ -2,6 +2,8 @@ provider "aws" {
   region = "us-east-2"
 }
 
+# VARIABLES
+
 variable "GH_DEPLOY_KEY" {
   type = string
   sensitive = true
@@ -15,9 +17,15 @@ variable "AWS_EIP" {
   type = string
 }
 
+variable "SSH_PUBLIC_KEY" {
+  type = string
+}
+
+# SECURITY GROUPS
+
 resource "aws_security_group" "pipeline_sg" {
-  name        = "open-ports"
-  description = "Open ports"
+  name        = "pipeline-open-ports"
+  description = "DevSecOps Pipeline Open ports"
 
   ingress {
     description = "Grafana"
@@ -35,7 +43,7 @@ resource "aws_security_group" "pipeline_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-    ingress {
+  ingress {
     description = "Debug SSH"
     from_port   = 22
     to_port     = 22
@@ -51,6 +59,45 @@ resource "aws_security_group" "pipeline_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "prod_sg" {
+  name        = "prod-open-ports"
+  description = "DevSecOps Prod Open ports"
+
+  ingress {
+    description = "SSH from DevSecOps Pipeline"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_instance.pipeline.private_ip}/32"]
+  }
+
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# IAM ROLES
 
 resource "aws_iam_role" "pipeline_ec2_role" {
   name = "pipeline-ec2-role"
@@ -97,6 +144,15 @@ resource "aws_iam_instance_profile" "pipeline_profile" {
   role = aws_iam_role.pipeline_ec2_role.name
 }
 
+# SSH KEYPAIR
+
+resource "aws_key_pair" "pipeline_key" {
+  key_name   = "pipeline-key"
+  public_key = var.SSH_PUBLIC_KEY
+}
+
+# MAIN RESOURCES
+
 resource "aws_instance" "pipeline" {
   ami           = "ami-0efc43a4067fe9a3e"
   instance_type = "t2.small"
@@ -120,8 +176,15 @@ resource "aws_instance" "pipeline" {
 # }
 
 resource "aws_instance" "prod" {
-  ami           = "ami-0efc43a4067fe9a3e"
-  instance_type = "t2.micro"
+  ami                     = "ami-0efc43a4067fe9a3e"
+  instance_type           = "t2.micro"
+  vpc_security_group_ids  = [aws_security_group.prod_sg.id]
+  key_name                = aws_key_pair.pipeline_key.key_name
+
+  user_data = templatefile("${path.module}/user_data_prod.sh", {
+    GH_DEPLOY_KEY = var.GH_DEPLOY_KEY,
+    GH_REPO_URL   = var.GH_REPO_URL
+  })
 }
 
 resource "aws_s3_bucket" "logbucket" {
