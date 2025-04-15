@@ -166,6 +166,7 @@ resource "aws_instance" "pipeline" {
   user_data = templatefile("${path.module}/user_data.sh", {
     GH_DEPLOY_KEY = var.GH_DEPLOY_KEY,
     GH_REPO_URL   = var.GH_REPO_URL
+    PROD_IP       = aws_instance.prod.private_ip
   })
 }
 
