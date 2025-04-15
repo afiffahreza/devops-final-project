@@ -25,15 +25,23 @@ RUN apt-get update && \
     groupadd docker || true && \
     usermod -aG docker jenkins
 
-# Install ZAP CLI
+# Install Python and pipx
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip python3-venv pipx && \
-    pipx ensurepath && \
-    pipx install zapcli && \
+    apt-get install -y --fix-broken python3 python3-pip python3-venv pipx && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ENV PATH="$MAVEN_HOME/bin:$PATH"
+# Update PATH
+ENV PATH="/root/.local/bin:$MAVEN_HOME/bin:$PATH"
+
+# pipx ensurepath
+RUN pipx ensurepath
+
+# Install Zap
+RUN pipx install zapcli
+
+# Install Ansible
+RUN pipx install --include-deps ansible
 
 # Copy the entrypoint script
 COPY jenkins/entrypoint.sh /usr/local/bin/entrypoint.sh
