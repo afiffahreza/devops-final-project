@@ -69,7 +69,7 @@ resource "aws_security_group" "prod_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${aws_instance.pipeline.private_ip}/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -156,7 +156,7 @@ resource "aws_key_pair" "pipeline_key" {
 resource "aws_instance" "pipeline" {
   ami           = "ami-0efc43a4067fe9a3e"
   instance_type = "t2.small"
-  vpc_security_group_ids = [aws_security_group.pipeline_sg.id]
+  vpc_security_group_ids      = [aws_security_group.pipeline_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.pipeline_profile.name
 
   root_block_device {
