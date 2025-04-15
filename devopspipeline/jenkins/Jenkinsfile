@@ -19,6 +19,15 @@ pipeline {
       }
     }
 
+    stage('Test Ansible Playbook Version') {
+      steps {
+        echo "Testing Ansible playbook version"
+        sh '''
+          ansible-playbook --version
+        '''
+      }
+    }
+
     stage('Build') {
       steps {
         echo "Building project"
