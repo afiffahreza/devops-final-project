@@ -32,12 +32,21 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Update PATH
-ENV PATH="/root/.local/bin:$MAVEN_HOME/bin:$PATH"
+ENV PIPX_HOME=/var/jenkins_home/.local/bin
+ENV PATH="$PIPX_HOME:$MAVEN_HOME/bin:$PATH"
 
 # Add pipx execution permissions
-RUN mkdir -p /root/.local/bin && \
-    chmod -R 755 /root/.local/bin && \
-    chown -R jenkins:jenkins /root/.local/bin
+RUN mkdir -p $PIPX_HOME && \
+    chmod -R 755 $PIPX_HOME && \
+    chown -R jenkins:jenkins $PIPX_HOME
+
+# Copy the entrypoint script
+COPY jenkins/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Make the script executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+USER jenkins
 
 # Ensure pipx in PATH
 RUN pipx ensurepath
@@ -48,15 +57,7 @@ RUN pipx install zapcli
 # Install Ansible
 RUN pipx install --include-deps ansible
 
-# Copy the entrypoint script
-COPY jenkins/entrypoint.sh /usr/local/bin/entrypoint.sh
-
-# Make the script executable
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # Set the entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-USER jenkins
 
 CMD ["/usr/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
