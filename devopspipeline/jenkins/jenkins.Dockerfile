@@ -34,7 +34,11 @@ RUN apt-get update && \
 # Update PATH
 ENV PATH="/root/.local/bin:$MAVEN_HOME/bin:$PATH"
 
-# pipx ensurepath
+# Add pipx execution permissions
+RUN chmod -R 644 /root/.local/bin && \
+    chown -R jenkins:jenkins /root/.local/bin
+
+# Ensure pipx in PATH
 RUN pipx ensurepath
 
 # Install Zap
