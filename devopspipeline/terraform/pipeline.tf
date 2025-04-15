@@ -180,6 +180,11 @@ resource "aws_instance" "prod" {
   instance_type           = "t2.micro"
   vpc_security_group_ids  = [aws_security_group.prod_sg.id]
   key_name                = aws_key_pair.pipeline_key.key_name
+
+  user_data = templatefile("${path.module}/user_data_prod.sh", {
+    GH_DEPLOY_KEY = var.GH_DEPLOY_KEY,
+    GH_REPO_URL   = var.GH_REPO_URL
+  })
 }
 
 resource "aws_s3_bucket" "logbucket" {
