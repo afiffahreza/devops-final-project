@@ -26,12 +26,12 @@ pipeline {
       }
     }
 
-    // stage('Test') {
-    //   steps {
-    //     echo "Running tests"
-    //     sh 'mvn test | tee logs/mvn-test.log'
-    //   }
-    // }
+    stage('Test') {
+      steps {
+        echo "Running tests"
+        sh 'mvn test | tee logs/mvn-test.log'
+      }
+    }
 
     stage('Run App') {
       steps {
@@ -64,28 +64,19 @@ pipeline {
       }
     }
 
-    stage('Ansible Test') {
+    stage('Run OWASP ZAP Scan') {
       steps {
-        echo "Running Ansible tests"
+        echo "Running ZAP scan from Jenkins against ${ZAP_TARGET_URL}"
         sh '''
-          ansible --version
+          docker exec zap zap-cli -p ${ZAP_PORT} status -t 60
+          docker exec zap zap-cli -p ${ZAP_PORT} open-url ${ZAP_TARGET_URL}
+          docker exec zap zap-cli -p ${ZAP_PORT} spider ${ZAP_TARGET_URL}
+          docker exec zap zap-cli -p ${ZAP_PORT} active-scan ${ZAP_TARGET_URL}
+          docker exec zap zap-cli -p ${ZAP_PORT} report -o /zap/wrk/zap-report.html -f html
+          docker cp zap:/zap/wrk/zap-report.html zap-reports/
         '''
       }
     }
-
-    // stage('Run OWASP ZAP Scan') {
-    //   steps {
-    //     echo "Running ZAP scan from Jenkins against ${ZAP_TARGET_URL}"
-    //     sh '''
-    //       docker exec zap zap-cli -p ${ZAP_PORT} status -t 60
-    //       docker exec zap zap-cli -p ${ZAP_PORT} open-url ${ZAP_TARGET_URL}
-    //       docker exec zap zap-cli -p ${ZAP_PORT} spider ${ZAP_TARGET_URL}
-    //       docker exec zap zap-cli -p ${ZAP_PORT} active-scan ${ZAP_TARGET_URL}
-    //       docker exec zap zap-cli -p ${ZAP_PORT} report -o /zap/wrk/zap-report.html -f html
-    //       docker cp zap:/zap/wrk/zap-report.html zap-reports/
-    //     '''
-    //   }
-    // }
 
     stage('Deploy') {
       when {
