@@ -159,6 +159,10 @@ resource "aws_instance" "pipeline" {
   vpc_security_group_ids = [aws_security_group.pipeline_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.pipeline_profile.name
 
+  root_block_device {
+    volume_size = 12
+  }
+
   user_data = templatefile("${path.module}/user_data.sh", {
     GH_DEPLOY_KEY = var.GH_DEPLOY_KEY,
     GH_REPO_URL   = var.GH_REPO_URL
