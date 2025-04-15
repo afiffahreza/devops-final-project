@@ -11,3 +11,9 @@ What has been attempted:
     - Add SonarQube installation to Jenkins system
  - Creating Jenkins pipeline using the Jenkinsfile and building
     - Doesn't work because it requires credentials for the github repo
+
+
+UPDATE:
+Sonarqube init added to setup-jenkins.groovy
+Was unable to test if to works myself. When I docker compose, the pipeline isn't built in Jenkins. 
+Could someone else try?
