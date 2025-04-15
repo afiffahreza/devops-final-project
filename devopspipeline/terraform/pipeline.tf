@@ -155,7 +155,7 @@ resource "aws_key_pair" "pipeline_key" {
 
 resource "aws_instance" "pipeline" {
   ami           = "ami-0efc43a4067fe9a3e"
-  instance_type = "t2.small"
+  instance_type = "t2.large"
   vpc_security_group_ids      = [aws_security_group.pipeline_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.pipeline_profile.name
 
