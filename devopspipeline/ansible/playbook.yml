@@ -43,7 +43,7 @@
   tasks:
     - name: Stop the currently running Java application
       shell: |
-        pkill -f 'spring-boot:run'
+        pkill -f 'java -jar'
       ignore_errors: yes
     - name: Clone the repository
       git:
@@ -54,11 +54,11 @@
     - name: Change directory to the repository and build the project
       shell: |
         cd /tmp/repo
-        mvn clean compile
+        ./mvnw package
       args:
         chdir: /tmp/repo
     - name: Run the Java application
       shell: |
-        mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=80
+        java -jar target/*.jar
       args:
         chdir: /tmp/repo
