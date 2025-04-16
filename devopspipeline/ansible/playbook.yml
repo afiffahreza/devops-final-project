@@ -4,6 +4,13 @@
   vars:
     repo_url: "git@github.com:afiffahreza/devops-final-project.git"
   pre_tasks:
+    - name: Install Java and Maven
+      apt:
+        name:
+          - openjdk-11-jdk
+          - maven
+        state: present
+        update_cache: yes
     - name: Ensure .ssh directory exists
       file:
         path: "~/.ssh"
@@ -38,11 +45,11 @@
     - name: Change directory to the repository and build the project
       shell: |
         cd /tmp/repo
-        ./mvnw package
+        mvn clean compile
       args:
         chdir: /tmp/repo
     - name: Run the Java application
       shell: |
-        java -jar target/*.jar
+        mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=80
       args:
         chdir: /tmp/repo
