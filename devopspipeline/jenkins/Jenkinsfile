@@ -87,7 +87,8 @@ pipeline {
         sh '''
           echo "[production]" > /var/jenkins_home/inventory
           echo "${PROD_IP}" >> /var/jenkins_home/inventory
-          ansible-playbook -i /var/jenkins_home/inventory devopspipeline/ansible/playbook.yml
+          echo "${GH_DEPLOY_KEY}" > /var/jenkins_home/deploy_key
+          ansible-playbook -i /var/jenkins_home/inventory -u ubuntu --private-key /var/jenkins_home/deploy_key devopspipeline/ansible/playbook.yml
         '''
       }
     }
