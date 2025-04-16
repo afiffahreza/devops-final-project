@@ -26,9 +26,8 @@ git clone $GH_REPO_URL /opt/devops-final-project
 mkdir /opt/env
 echo "GH_DEPLOY_KEY=${GH_DEPLOY_KEY}" >> /opt/env/.env
 echo "GH_REPO_URL=${GH_REPO_URL}" >> /opt/env/.env
+echo "PROD_IP=${PROD_IP}" >> /opt/env/.env
 
 cd /opt/devops-final-project/devopspipeline
-
-echo "$PROD_IP" >> /opt/devops-final-project/devopspipeline/ansible/inventory
 
 sudo docker-compose up -d
