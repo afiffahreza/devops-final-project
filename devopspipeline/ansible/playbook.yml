@@ -2,7 +2,7 @@
 - name: Clone, build, and run Java application
   hosts: production
   vars:
-    repo_url: "https://github.com/afiffahreza/devops-final-project.git"
+    repo_url: "git@github.com:afiffahreza/devops-final-project.git"
   pre_tasks:
     - name: Ensure .ssh directory exists
       file:
