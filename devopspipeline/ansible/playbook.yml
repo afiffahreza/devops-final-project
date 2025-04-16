@@ -51,14 +51,9 @@
         dest: "/tmp/repo"
         update: yes
         key_file: "~/.ssh/id_rsa"
-    - name: Change directory to the repository and build the project
+    - name: Change directory to the repository and run the app
       shell: |
         cd /tmp/repo
-        ./mvnw package
-      args:
-        chdir: /tmp/repo
-    - name: Run the Java application
-      shell: |
-        java -jar target/*.jar
+        ./mvnw spring-boot:run
       args:
         chdir: /tmp/repo
