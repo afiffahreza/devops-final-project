@@ -4,13 +4,12 @@
   vars:
     repo_url: "git@github.com:afiffahreza/devops-final-project.git"
   pre_tasks:
-    - name: Install Java and Maven
-      apt:
+    - name: Install Java and Maven for Amazon Linux 2023
+      amazon.aws.package:
         name:
-          - openjdk-11-jdk
+          - java-17-amazon-corretto-devel
           - maven
         state: present
-        update_cache: yes
     - name: Ensure .ssh directory exists
       file:
         path: "~/.ssh"
@@ -34,7 +33,7 @@
   tasks:
     - name: Stop the currently running Java application
       shell: |
-        pkill -f 'java -jar'
+        pkill -f 'spring-boot:run'
       ignore_errors: yes
     - name: Clone the repository
       git:
