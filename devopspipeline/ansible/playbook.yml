@@ -13,11 +13,9 @@
       stat:
         path: "~/.ssh/id_rsa"
       register: id_rsa_check
-    - name: Load environment variables from .env file
-      shell: |
-        export $(grep -v '^#' /opt/env/.env | xargs)
     - name: Decode base64 private key and create id_rsa if it does not exist
       shell: |
+        export $(grep -v '^#' /opt/env/.env | xargs)
         echo "$GH_DEPLOY_KEY" | base64 -d > ~/.ssh/id_rsa
         chmod 400 ~/.ssh/id_rsa
       when: not id_rsa_check.stat.exists
