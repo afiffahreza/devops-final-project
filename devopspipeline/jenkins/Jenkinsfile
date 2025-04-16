@@ -84,9 +84,10 @@ pipeline {
       // }
       steps {
         echo "Deploying to production"
-        echo "Using host: ${env.PROD_IP}"
         sh '''
-          ansible-playbook -i ${PROD_IP}, devopspipeline/ansible/playbook.yml
+          echo "[production]" > /var/jenkins_home/inventory
+          echo "${PROD_IP}" >> /var/jenkins_home/inventory
+          ansible-playbook -i /var/jenkins_home/inventory devopspipeline/ansible/playbook.yml
         '''
       }
     }

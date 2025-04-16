@@ -1,5 +1,6 @@
 ---
 - name: Clone, build, and run Java application
+  hosts: production
   become: yes
   vars:
     repo_url: "https://github.com/afiffahreza/devops-final-project.git"
