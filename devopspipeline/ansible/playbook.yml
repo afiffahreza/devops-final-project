@@ -4,11 +4,18 @@
   vars:
     repo_url: "git@github.com:afiffahreza/devops-final-project.git"
   pre_tasks:
-    - name: Install Java and Maven for Amazon Linux 2023
-      amazon.aws.package:
-        name:
-          - java-17-amazon-corretto-devel
-          - maven
+    - name: Update all packages
+      dnf:
+        name: '*'
+        state: latest
+        update_cache: yes
+    - name: Install Java
+      dnf:
+        name: java-17-amazon-corretto
+        state: present
+    - name: Install Maven package
+      dnf:
+        name: maven
         state: present
     - name: Ensure .ssh directory exists
       file:
