@@ -46,79 +46,82 @@ try {
     logger.severe("Failed to create admin user: ${e.message}")
 }
 
-// === 1. Create SonarQube token credential ===
-def SONARQUBE_URL = "http://sonarqube:9000"
-def ADMIN_USER = "admin"
-def ADMIN_PASS = "DevopsSonar1."
-def TOKEN_NAME = "jenkins"
+// // === 1. Create SonarQube token credential ===
+// def SONARQUBE_URL = "http://sonarqube:9000"
+// def ADMIN_USER = "admin"
+// def ADMIN_PASS = "DevopsSonar1."
+// def TOKEN_NAME = "jenkins"
 
-// Wait for SonarQube to be ready
-sleep(time:120, unit:'SECONDS')
+// // Wait for SonarQube to be ready
+// sleep(180000)
 
-def changePassword = ["bash", "-c", """
-  curl -u admin:admin -X POST http://localhost:9000/api/users/change_password -d "login=admin" -d "previousPassword=admin" -d "password=${ADMIN_PASS}"
-"""].execute().text
+// // def changePassword = ["bash", "-c", """
+// //   curl -u admin:admin -X POST http://localhost:9000/api/users/change_password -d "login=admin" -d "previousPassword=admin" -d "password=${ADMIN_PASS}"
+// // """].execute().text
+// def changePassword = ["curl", "-u", "admin:admin", "-X", "POST", "http://localhost:9000/api/users/change_password", "-d", "'login=admin'", "-d", "'previousPassword=admin'", "-d", "'password=${ADMIN_PASS}'"].execute().text
+// println "printing here"
+// println changePassword
 
-def tokenJson = ["bash", "-c", """
-  curl -s -u ${ADMIN_USER}:${ADMIN_PASS} -X POST ${SONARQUBE_URL}/api/user_tokens/generate -d "name=${TOKEN_NAME}"
-"""].execute().text
+// def tokenJson = ["bash", "-c", """
+//   curl -s -u ${ADMIN_USER}:${ADMIN_PASS} -X POST ${SONARQUBE_URL}/api/user_tokens/generate -d "name=${TOKEN_NAME}"
+// """].execute().text
 
-def tokenResp = new JsonSlurper().parseText(tokenJson)
-def token = tokenResp.token
+// def tokenResp = new JsonSlurper().parseText(tokenJson)
+// def token = tokenResp.token
 
-if (token) {
-    println "✅ Token created: ${token}"
+// if (token) {
+//     println "✅ Token created: ${token}"
 
-    def creds = new StringCredentialsImpl(
-        CredentialsScope.GLOBAL,
-        "sonarqube",
-        "Auto-created SonarQube token",
-        Secret.fromString(token)
-    )
+//     // def creds = new StringCredentialsImpl(
+//     //     CredentialsScope.GLOBAL,
+//     //     "sonarqube",
+//     //     "Auto-created SonarQube token",
+//     //     Secret.fromString(token)
+//     // )
 
-    def credentialsStore = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-    credentialsStore.addCredentials(Domain.global(), sonarTokenCreds)
-    println "🔐 Token added to Jenkins credentials."
+//     def credentialsStore = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
+//     credentialsStore.addCredentials(Domain.global(), sonarTokenCreds)
+//     println "🔐 Token added to Jenkins credentials."
 
-// === 2. Configure SonarQube installation ===
-    def sonarName = "sonarqube"
-    def sonarInstExists = false
+// // === 2. Configure SonarQube installation ===
+//     def sonarName = "sonarqube"
+//     def sonarInstExists = false
 
-    def sonarDescriptor = SonarGlobalConfiguration.get()
-    def sonarInstallations = sonarDescriptor.getInstallations()
+//     def sonarDescriptor = SonarGlobalConfiguration.get()
+//     def sonarInstallations = sonarDescriptor.getInstallations()
 
-    sonarInstallations.each {
-    if (it.getName() == sonarName) {
-        sonarInstExists = true
-    }
+//     sonarInstallations.each {
+//     if (it.getName() == sonarName) {
+//         sonarInstExists = true
+//     }
 
-    if (!sonarInstExists) {
-        println "[INFO] Adding SonarQube installation..."
-        def newInst = new SonarInstallation(
-            sonarName,
-            SONARQUBE_URL,
-            sonarqube,
-            "",
-            "",
-            "",
-            false,
-            ""
-        )
+//     if (!sonarInstExists) {
+//         println "[INFO] Adding SonarQube installation..."
+//         def newInst = new SonarInstallation(
+//             sonarName,
+//             SONARQUBE_URL,
+//             sonarqube,
+//             "",
+//             "",
+//             "",
+//             false,
+//             ""
+//         )
 
-        def updatedList = sonarInstallations as List
-        updatedList.add(newInst)
-        sonarDescriptor.setInstallations(updatedList.toArray(new SonarInstallation[0]))
-        sonarDescriptor.save()
-    } else {
-        println "[INFO] SonarQube installation already exists"
-    }
+//         def updatedList = sonarInstallations as List
+//         updatedList.add(newInst)
+//         sonarDescriptor.setInstallations(updatedList.toArray(new SonarInstallation[0]))
+//         sonarDescriptor.save()
+//     } else {
+//         println "[INFO] SonarQube installation already exists"
+//     }
 
-println "[INFO] === SonarQube Configuration Complete ==="
-}
+// println "[INFO] === SonarQube Configuration Complete ==="
+// }
 
-} else {
-    println "❌ Failed to create token. Response: ${tokenJson}"
-}
+// } else {
+//     println "❌ Failed to create token. Response: ${tokenJson}"
+// }
 
 try {
     jenkins.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
