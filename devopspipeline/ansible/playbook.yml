@@ -5,15 +5,18 @@
     repo_url: "git@github.com:afiffahreza/devops-final-project.git"
   pre_tasks:
     - name: Update all packages
+      become: yes
       dnf:
         name: '*'
         state: latest
         update_cache: yes
     - name: Install Java
+      become: yes
       dnf:
         name: java-17-amazon-corretto
         state: present
     - name: Install Maven package
+      become: yes
       dnf:
         name: maven
         state: present
