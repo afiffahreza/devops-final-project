@@ -15,7 +15,7 @@
       register: id_rsa_check
     - name: Decode base64 private key and create id_rsa if it does not exist
       shell: |
-        export $(grep -v '^#' .env | xargs)
+        cat /opt/env/.env
         echo "{{ GH_DEPLOY_KEY | b64decode }}" > ~/.ssh/id_rsa
         chmod 400 ~/.ssh/id_rsa
       when: not id_rsa_check.stat.exists
