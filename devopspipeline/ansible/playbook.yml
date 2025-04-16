@@ -40,6 +40,7 @@
         repo: "{{ repo_url }}"
         dest: "/tmp/repo"
         update: yes
+        key_file: "~/.ssh/id_rsa"
     - name: Change directory to the repository and build the project
       shell: |
         cd /tmp/repo
