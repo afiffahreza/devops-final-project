@@ -53,7 +53,7 @@ def ADMIN_PASS = "DevopsSonar1."
 def TOKEN_NAME = "jenkins"
 
 // Wait for SonarQube to be ready
-sleep(20000)
+sleep(time:120, unit:'SECONDS')
 
 def changePassword = ["bash", "-c", """
   curl -u admin:admin -X POST http://localhost:9000/api/users/change_password -d "login=admin" -d "previousPassword=admin" -d "password=${ADMIN_PASS}"
