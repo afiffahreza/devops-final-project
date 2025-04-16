@@ -90,7 +90,7 @@ pipeline {
           chmod 644 /var/jenkins_home/deploy_key
           echo "${GH_DEPLOY_KEY}" | base64 --decode > /var/jenkins_home/deploy_key
           chmod 400 /var/jenkins_home/deploy_key
-          ansible-playbook -v -i /var/jenkins_home/inventory -u ec2-user --private-key /var/jenkins_home/deploy_key devopspipeline/ansible/playbook.yml
+          ansible-playbook -vv -i /var/jenkins_home/inventory -u ec2-user --private-key /var/jenkins_home/deploy_key devopspipeline/ansible/playbook.yml
         '''
       }
     }

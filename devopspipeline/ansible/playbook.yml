@@ -21,10 +21,6 @@
         echo "$GH_DEPLOY_KEY" | base64 -d > ~/.ssh/id_rsa
         chmod 400 ~/.ssh/id_rsa
       when: not id_rsa_check.stat.exists
-    - name: Ensure id_rsa has 400 permissions
-      file:
-        path: "~/.ssh/id_rsa"
-        mode: '0400'
     - name: Add GitHub to known_hosts
       shell: |
         ssh-keyscan github.com >> ~/.ssh/known_hosts
