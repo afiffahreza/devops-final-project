@@ -86,8 +86,7 @@ pipeline {
         echo "Deploying to production"
         echo "Using host: ${env.PROD_IP}"
         sh '''
-          printenv
-          # ansible-playbook -i ${PROD_IP}, devopspipeline/ansible/playbook.yml
+          ansible-playbook -i ${PROD_IP}, devopspipeline/ansible/playbook.yml
         '''
       }
     }
