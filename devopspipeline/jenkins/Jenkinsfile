@@ -82,14 +82,12 @@ pipeline {
       // when {
       //   branch 'master'
       // }
-      environment {
-        PROD_IP = env.PROD_IP
-      }
       steps {
         echo "Deploying to production"
         echo "Using host: ${env.PROD_IP}"
         sh '''
-          ansible-playbook -i ${PROD_IP}, devopspipeline/ansible/playbook.yml
+          printenv
+          # ansible-playbook -i ${PROD_IP}, devopspipeline/ansible/playbook.yml
         '''
       }
     }
