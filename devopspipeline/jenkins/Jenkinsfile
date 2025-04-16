@@ -85,7 +85,7 @@ pipeline {
       steps {
         echo "Deploying to production"
         sh '''
-          ansible-playbook -i devopspipeline/ansible/inventory devopspipeline/ansible/playbook.yml
+          ansible-playbook -i ${env.PROD_IP}, devopspipeline/ansible/playbook.yml
         '''
       }
     }
