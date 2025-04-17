@@ -43,7 +43,7 @@
   tasks:
     - name: Stop the currently running Java application
       shell: |
-        kill $(cat /opt/env/app.pid) || true
+        kill $(cat ~/pid) || true
       ignore_errors: yes
     - name: Clone the repository
       git:
@@ -60,6 +60,6 @@
     - name: Run the Java application
       shell: |
         nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8080 > logs/app.log 2>&1 &
-        echo $! > /opt/env/app.pid
+        echo $! > ~/pid
       args:
         chdir: /tmp/repo
