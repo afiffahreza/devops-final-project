@@ -55,11 +55,8 @@
       shell: |
         cd /tmp/repo
         mvn clean compile
-      args:
-        chdir: /tmp/repo
     - name: Run the Java application
       shell: |
-        nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8080 > logs/app.log 2>&1 &
+        cd /tmp/repo
+        nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8080 > app.log 2>&1 &
         echo $! > ~/pid
-      args:
-        chdir: /tmp/repo
