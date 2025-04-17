@@ -87,6 +87,7 @@ pipeline {
         sh '''
           echo "[production]" > /var/jenkins_home/inventory
           echo "${PROD_IP}" >> /var/jenkins_home/inventory
+          echo "${PROD_IP}" >> /var/jenkins_home/.ssh/known_hosts
           chmod 644 /var/jenkins_home/deploy_key || true
           echo "${GH_DEPLOY_KEY}" | base64 --decode > /var/jenkins_home/deploy_key
           chmod 400 /var/jenkins_home/deploy_key
