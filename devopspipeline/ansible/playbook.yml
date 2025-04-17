@@ -1,27 +1,62 @@
 ---
 - name: Clone, build, and run Java application
   hosts: production
-  become: yes
   vars:
-    repo_url: "https://github.com/afiffahreza/devops-final-project.git"
+    repo_url: "git@github.com:afiffahreza/devops-final-project.git"
+  pre_tasks:
+    - name: Update all packages
+      become: yes
+      dnf:
+        name: '*'
+        state: latest
+        update_cache: yes
+    - name: Install Java
+      become: yes
+      dnf:
+        name: java-17-amazon-corretto
+        state: present
+    - name: Install Maven package
+      become: yes
+      dnf:
+        name: maven
+        state: present
+    - name: Ensure .ssh directory exists
+      file:
+        path: "~/.ssh"
+        state: directory
+        mode: '0700'
+    - name: Check if id_rsa exists
+      stat:
+        path: "~/.ssh/id_rsa"
+      register: id_rsa_check
+    - name: Decode base64 private key and create id_rsa if it does not exist
+      shell: |
+        export $(grep -v '^#' /opt/env/.env | xargs)
+        echo "$GH_DEPLOY_KEY" | base64 -d > ~/.ssh/id_rsa
+        chmod 400 ~/.ssh/id_rsa
+      when: not id_rsa_check.stat.exists
+    - name: Add GitHub to known_hosts
+      shell: |
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+      args:
+        creates: "~/.ssh/known_hosts"
   tasks:
     - name: Stop the currently running Java application
       shell: |
-        pkill -f 'java -jar'
+        kill $(cat ~/pid) || true
       ignore_errors: yes
     - name: Clone the repository
       git:
         repo: "{{ repo_url }}"
         dest: "/tmp/repo"
         update: yes
+        key_file: "~/.ssh/id_rsa"
     - name: Change directory to the repository and build the project
       shell: |
         cd /tmp/repo
-        ./mvnw package
-      args:
-        chdir: /tmp/repo
+        mvn clean compile
     - name: Run the Java application
       shell: |
-        java -jar target/*.jar
-      args:
-        chdir: /tmp/repo
+        cd /tmp/repo
+        nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8080 > app.log 2>&1 &
+        echo $! > ~/pid
