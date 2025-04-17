@@ -7,3 +7,7 @@ workflow-cps
 workflow-aggregator
 
 prometheus
+
+sonar
+blueocean
+maven-plugin
