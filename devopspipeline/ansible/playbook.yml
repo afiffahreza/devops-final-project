@@ -43,7 +43,7 @@
   tasks:
     - name: Stop the currently running Java application
       shell: |
-        pkill -f 'mvn spring-boot:run'
+        kill $(cat /opt/env/app.pid) || true
       ignore_errors: yes
     - name: Clone the repository
       git:
@@ -60,27 +60,6 @@
     - name: Run the Java application
       shell: |
         nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8080 > logs/app.log 2>&1 &
-        echo $! > app.pid
-
-        echo "Waiting for app to be available at http://localhost:8080..."
-        for i in $(seq 1 30); do
-          if curl -s --head --fail http://localhost:8080; then
-            echo "App is up!"
-            exit 0
-          fi
-          echo "App not up yet, retrying in 5s... ($i/30)"
-          sleep 5
-        done
-
-        echo "App did not start in time after 30 attempts."
-        echo "Dumping logs from logs/app.log:"
-        echo "----------------------------------"
-        cat logs/app.log || echo "No logs found!"
-        echo "----------------------------------"
-
-        echo "🔪 Killing Spring Boot app process if it's still running..."
-        kill $APP_PID || true
-
-        exit 1
+        echo $! > /opt/env/app.pid
       args:
         chdir: /tmp/repo
