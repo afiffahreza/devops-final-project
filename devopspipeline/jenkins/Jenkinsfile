@@ -26,43 +26,43 @@ pipeline {
       }
     }
 
-    // stage('Test') {
-    //   steps {
-    //     echo "Running tests"
-    //     sh 'mvn test | tee logs/mvn-test.log'
-    //   }
-    // }
+    stage('Test') {
+      steps {
+        echo "Running tests"
+        sh 'mvn test | tee logs/mvn-test.log'
+      }
+    }
 
-    // stage('Run App') {
-    //   steps {
-    //     echo "Starting Spring Boot app on port ${APP_PORT}"
-    //     sh '''
-    //       nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=${APP_PORT} > logs/app.log 2>&1 &
-    //       echo $! > app.pid
+    stage('Run App') {
+      steps {
+        echo "Starting Spring Boot app on port ${APP_PORT}"
+        sh '''
+          nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=${APP_PORT} > logs/app.log 2>&1 &
+          echo $! > app.pid
 
-    //       echo "Waiting for app to be available at ${LOCAL_TARGET_URL}..."
-    //       for i in $(seq 1 20); do
-    //         if curl -s --head --fail ${LOCAL_TARGET_URL}; then
-    //           echo "App is up!"
-    //           exit 0
-    //         fi
-    //         echo "App not up yet, retrying in 5s... ($i/20)"
-    //         sleep 5
-    //       done
+          echo "Waiting for app to be available at ${LOCAL_TARGET_URL}..."
+          for i in $(seq 1 20); do
+            if curl -s --head --fail ${LOCAL_TARGET_URL}; then
+              echo "App is up!"
+              exit 0
+            fi
+            echo "App not up yet, retrying in 5s... ($i/20)"
+            sleep 5
+          done
 
-    //       echo "App did not start in time after 20 attempts."
-    //       echo "Dumping logs from logs/app.log:"
-    //       echo "----------------------------------"
-    //       cat logs/app.log || echo "No logs found!"
-    //       echo "----------------------------------"
+          echo "App did not start in time after 20 attempts."
+          echo "Dumping logs from logs/app.log:"
+          echo "----------------------------------"
+          cat logs/app.log || echo "No logs found!"
+          echo "----------------------------------"
 
-    //       echo "🔪 Killing Spring Boot app process if it's still running..."
-    //       kill $APP_PID || true
+          echo "🔪 Killing Spring Boot app process if it's still running..."
+          kill $APP_PID || true
 
-    //       exit 1
-    //     '''
-    //   }
-    // }
+          exit 1
+        '''
+      }
+    }
 
     // stage('Run OWASP ZAP Scan') {
     //   steps {
@@ -79,9 +79,9 @@ pipeline {
     // }
 
     stage('Deploy') {
-      // when {
-      //   branch 'master'
-      // }
+      when {
+        branch 'master'
+      }
       steps {
         echo "Deploying to production"
         sh '''
@@ -92,6 +92,7 @@ pipeline {
           chmod 400 /var/jenkins_home/deploy_key
           ansible-playbook -vv -i /var/jenkins_home/inventory -u ec2-user --private-key /var/jenkins_home/deploy_key devopspipeline/ansible/playbook.yml
         '''
+        echo "Deployment complete: ${PROD_IP}:8080"
       }
     }
   }
