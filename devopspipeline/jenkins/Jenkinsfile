@@ -87,10 +87,10 @@ pipeline {
         sh '''
           echo "[production]" > /var/jenkins_home/inventory
           echo "${PROD_IP}" >> /var/jenkins_home/inventory
-          ssh-keyscan -H ${PROD_IP} >> /var/jenkins_home/known_hosts
           chmod 644 /var/jenkins_home/deploy_key || true
           echo "${GH_DEPLOY_KEY}" | base64 --decode > /var/jenkins_home/deploy_key
           chmod 400 /var/jenkins_home/deploy_key
+          export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -vv -i /var/jenkins_home/inventory -u ec2-user --private-key /var/jenkins_home/deploy_key devopspipeline/ansible/playbook.yml
         '''
         echo "Deployment complete: ${PROD_IP}:8080"
