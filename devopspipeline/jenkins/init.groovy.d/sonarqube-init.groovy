@@ -63,7 +63,7 @@ if (rc == 200) {
 
     // Add the SonarQube server config to Jenkins
     SonarInstallation sonarInst = new SonarInstallation(
-        "sonar", sonarHost, token, "", "", new TriggersConfig(), "")
+        "sonarqube", sonarHost, token, "", "", new TriggersConfig(), "")
     sonarConfig.setInstallations(sonarInst)
     sonarConfig.setBuildWrapperEnabled(true)
     sonarConfig.save()
@@ -76,7 +76,7 @@ if (rc == 200) {
 
     def installer = new SonarRunnerInstaller("3.0.3.778")
     def prop = new InstallSourceProperty([installer])
-    def sinst = new SonarRunnerInstallation("sonar-scanner-tool", "", [prop])
+    def sinst = new SonarRunnerInstallation("sonarqube", "", [prop])
     sonarRunner.setInstallations(sinst)
 
     sonarRunner.save()
