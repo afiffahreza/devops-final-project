@@ -51,9 +51,6 @@ USER jenkins
 # Ensure pipx in PATH
 RUN pipx ensurepath
 
-# Install Zap
-RUN pipx install zapcli
-
 # Install Ansible
 RUN pipx install --include-deps ansible
 

@@ -1,0 +1,30 @@
+services:
+  spring-petclinic:
+    build: ../../.
+    networks:
+      - zapnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy
+    environment:
+      ZAP_PORT: 8090
+    volumes:
+      - ./logs:/zap/wrk
+    command: >
+      zap-full-scan.py -t http://spring-petclinic:8080 -r zap_output.html
+    networks:
+      - zapnet
+    user: zap
+    depends_on:
+      spring-petclinic:
+        condition: service_healthy
+
+networks:
+  zapnet:
+    driver: bridge

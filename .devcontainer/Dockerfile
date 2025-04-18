@@ -10,6 +10,16 @@ RUN curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opent
     && ./install-opentofu.sh --install-method deb \
     && rm -f install-opentofu.sh
 
+ENV MAVEN_VERSION=3.9.6
+ENV MAVEN_HOME=/opt/maven
+
+ENV PATH="$MAVEN_HOME/bin:$PATH"
+
+RUN curl -fsSL https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz -o /tmp/maven.tar.gz && \
+    mkdir -p $MAVEN_HOME && \
+    tar -xzf /tmp/maven.tar.gz -C $MAVEN_HOME --strip-components=1 && \
+    rm /tmp/maven.tar.gz
+
 # ARG NODE_VERSION="none"
 # RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 # ARG USER=vscode

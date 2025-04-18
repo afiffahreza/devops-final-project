@@ -43,50 +43,21 @@ pipeline {
       }
     }
 
-    stage('Run App') {
+    stage('ZAP') {
       steps {
-        echo "Starting Spring Boot app on port ${APP_PORT}"
+        echo "Running ZAP scan"
         sh '''
-          nohup mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=${APP_PORT} > logs/app.log 2>&1 &
-          echo $! > app.pid
-
-          echo "Waiting for app to be available at ${LOCAL_TARGET_URL}..."
-          for i in $(seq 1 20); do
-            if curl -s --head --fail ${LOCAL_TARGET_URL}; then
-              echo "App is up!"
-              exit 0
-            fi
-            echo "App not up yet, retrying in 5s... ($i/20)"
-            sleep 5
-          done
-
-          echo "App did not start in time after 20 attempts."
-          echo "Dumping logs from logs/app.log:"
-          echo "----------------------------------"
-          cat logs/app.log || echo "No logs found!"
-          echo "----------------------------------"
-
-          echo "🔪 Killing Spring Boot app process if it's still running..."
-          kill $APP_PID || true
-
-          exit 1
+          cd devopspipeline/owaspzap
+          ./run_zap.sh
         '''
       }
     }
 
-    // stage('Run OWASP ZAP Scan') {
-    //   steps {
-    //     echo "Running ZAP scan from Jenkins against ${ZAP_TARGET_URL}"
-    //     sh '''
-    //       docker exec zap zap-cli -p ${ZAP_PORT} status -t 60
-    //       docker exec zap zap-cli -p ${ZAP_PORT} open-url ${ZAP_TARGET_URL}
-    //       docker exec zap zap-cli -p ${ZAP_PORT} spider ${ZAP_TARGET_URL}
-    //       docker exec zap zap-cli -p ${ZAP_PORT} active-scan ${ZAP_TARGET_URL}
-    //       docker exec zap zap-cli -p ${ZAP_PORT} report -o /zap/wrk/zap-report.html -f html
-    //       docker cp zap:/zap/wrk/zap-report.html zap-reports/
-    //     '''
-    //   }
-    // }
+    stage('Archive ZAP') {
+      steps {
+        archiveArtifacts artifacts: 'devopspipeline/owaspzap/logs/*', allowEmptyArchive: true
+      }
+    }
 
     stage('Deploy') {
       when {
