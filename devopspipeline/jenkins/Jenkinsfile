@@ -48,6 +48,8 @@ pipeline {
         echo "Running ZAP scan"
         sh '''
           cd devopspipeline/owaspzap
+          mkdir -p logs
+          chmod 777 logs
           ./run_zap.sh
         '''
       }

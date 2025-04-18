@@ -11,6 +11,8 @@ docker-compose version
 systemctl start docker
 systemctl enable docker
 
+chmod 666 /var/run/docker.sock
+
 export GH_DEPLOY_KEY=$(echo "${GH_DEPLOY_KEY}")
 export GH_REPO_URL=$(echo "${GH_REPO_URL}")
 export PROD_IP=$(echo "${PROD_IP}")
