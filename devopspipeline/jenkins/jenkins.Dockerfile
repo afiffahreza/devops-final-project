@@ -24,8 +24,8 @@ RUN curl -fsSL https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binar
 # Install Docker CLI so Jenkins can run docker exec/run
 RUN apt-get update && \
     apt-get install -y docker.io && \
-    groupadd docker || true && \
-    usermod -aG docker jenkins
+    groupadd messagebus || true && \
+    usermod -aG messagebus jenkins
 
 RUN curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 RUN chmod +x /usr/local/bin/docker-compose && docker-compose version
