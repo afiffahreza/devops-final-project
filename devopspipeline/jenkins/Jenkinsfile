@@ -52,8 +52,6 @@ pipeline {
             mkdir -p logs
             chmod 777 logs
             docker-compose -f zap-compose.yml up --build  --abort-on-container-exit --exit-code-from zap
-
-            cp /zap-logs/* "$../../logs/"
           ''', returnStatus: true)
 
           if (zap_status != 3) {
@@ -62,7 +60,12 @@ pipeline {
             error("Zap error code ${zap_status}")
           }
 
-          archiveArtifacts artifacts: '/logs/*', allowEmptyArchive: true
+          sh(script: '''
+            set -e
+            cp /zap-logs/*.html logs/
+          ''')
+
+          archiveArtifacts artifacts: 'logs/*', allowEmptyArchive: true
         }
       }
     }
