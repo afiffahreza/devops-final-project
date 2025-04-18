@@ -15,9 +15,9 @@ services:
     environment:
       ZAP_PORT: 8090
     volumes:
-      - ./logs:/zap/wrk
+      - /opt/zap-logs:/zap/wrk
     command: >
-      zap-full-scan.py -t http://spring-petclinic:8080 -r zap_output.html
+      zap-full-scan.py -t http://spring-petclinic:8080 -r zap_output.html -d
     networks:
       - zapnet
     user: root

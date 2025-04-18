@@ -45,19 +45,25 @@ pipeline {
 
     stage('ZAP') {
       steps {
-        echo "Running ZAP scan"
-        sh '''
-          cd devopspipeline/owaspzap
-          mkdir -p logs
-          chmod 777 logs
-          ./run_zap.sh
-        '''
-      }
-    }
+        script {
+          def zap_status = sh(script: '''
+            mvn clean package -DskipTests
+            cd devopspipeline/owaspzap
+            mkdir -p logs
+            chmod 777 logs
+            docker-compose -f zap-compose.yml up --build  --abort-on-container-exit --exit-code-from zap
 
-    stage('Archive ZAP') {
-      steps {
-        archiveArtifacts artifacts: 'devopspipeline/owaspzap/logs/*', allowEmptyArchive: true
+            cp /zap-logs/* "$../../logs/"
+          ''', returnStatus: true)
+
+          if (zap_status != 3) {
+            echo "OWASP ZAP OK!"
+          } else {
+            error("Zap error code ${zap_status}")
+          }
+
+          archiveArtifacts artifacts: '/logs/*', allowEmptyArchive: true
+        }
       }
     }
 

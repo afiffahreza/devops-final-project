@@ -45,6 +45,8 @@ RUN mkdir -p $PIPX_HOME && \
     chmod -R 755 $PIPX_HOME && \
     chown -R jenkins:jenkins $PIPX_HOME
 
+RUN mkdir -p /zap-logs
+
 USER jenkins
 
 # Ensure pipx in PATH

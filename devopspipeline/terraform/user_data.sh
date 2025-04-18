@@ -12,6 +12,7 @@ systemctl start docker
 systemctl enable docker
 
 chmod 666 /var/run/docker.sock
+mkdir /opt/zap-logs
 
 export GH_DEPLOY_KEY=$(echo "${GH_DEPLOY_KEY}")
 export GH_REPO_URL=$(echo "${GH_REPO_URL}")

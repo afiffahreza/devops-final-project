@@ -168,7 +168,7 @@ resource "aws_instance" "pipeline" {
   iam_instance_profile        = aws_iam_instance_profile.pipeline_profile.name
 
   root_block_device {
-    volume_size = 12
+    volume_size = 30
   }
 
   user_data = templatefile("${path.module}/user_data.sh", {

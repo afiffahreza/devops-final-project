@@ -18,6 +18,7 @@ services:
       - jenkins_home:/var/jenkins_home
       - ./jenkins/init.groovy.d:/var/jenkins_home/init.groovy.d
       - ./jenkins/workflows:/var/jenkins_home/workflows
+      - /opt/zap-logs:/zap-logs
       # Allow Jenkins to talk to host Docker daemon to run docker exec
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
