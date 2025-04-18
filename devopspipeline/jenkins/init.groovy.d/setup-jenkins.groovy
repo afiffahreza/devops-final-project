@@ -73,7 +73,7 @@ while (!sonarqubeReady && retryCount < maxRetries) {
             def response = new JsonSlurper().parseText(connection.getInputStream().getText())
             if (response.status == "UP") {
                 sonarqubeReady = true
-                println "✅ SonarQube is up and running!"
+                println "SonarQube is up and running!"
             } else {
                 println "SonarQube status: ${response.status}, waiting..."
             }
@@ -91,7 +91,7 @@ while (!sonarqubeReady && retryCount < maxRetries) {
 }
 
 if (!sonarqubeReady) {
-    println "❌ SonarQube did not become available after ${maxRetries} attempts"
+    println "SonarQube did not become available after ${maxRetries} attempts"
     return
 }
 
@@ -105,19 +105,15 @@ def changePassword = [
     "-d", "password=${ADMIN_PASS}"
 ].execute()
 
+changePassword.waitFor()
+
 def statusCode = changePassword.text.trim()
 def exitCode = changePassword.exitValue()
 
 if (exitCode == 0 && statusCode == "204") {
-    println "✅ Admin password changed successfully"
+    println "Admin password changed successfully"
 } else {
-    println "❌ Failed to change admin password. Status code: ${statusCode}, Exit code: ${exitCode}"
-    
-    // For detailed error information
-    def errorOutput = process.err.text
-    if (errorOutput) {
-        println "Error details: ${errorOutput}"
-    }
+    println "Failed to change admin password. Status code: ${statusCode}, Exit code: ${exitCode}"
 }
 
 def tokenJson = [
@@ -132,7 +128,7 @@ def tokenResp = new JsonSlurper().parseText(tokenJson)
 def token = tokenResp.token
 
 if (token) {
-    println "✅ Token created: ${token}"
+    println "Token created: ${token}"
 
         def sonarTokenCreds = new StringCredentialsImpl(
         CredentialsScope.GLOBAL,
@@ -143,7 +139,7 @@ if (token) {
 
     def credentialsStore = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
     credentialsStore.addCredentials(Domain.global(), sonarTokenCreds)
-    println "🔐 Token added to Jenkins credentials."
+    println "Token added to Jenkins credentials."
 
 // === 2. Configure SonarQube installation ===
     def sonarName = "sonarqube"
@@ -180,7 +176,7 @@ if (token) {
 
     println "[INFO] === SonarQube Configuration Complete ==="
 } else {
-    println "❌ Failed to create token. Response: ${tokenJson}"
+    println "Failed to create token. Response: ${tokenJson}"
 }
 
 try {

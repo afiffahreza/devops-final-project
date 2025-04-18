@@ -1,5 +1,7 @@
 FROM jenkins/jenkins:lts
 
+ARG DOCKER_GID=123
+
 USER root
 
 # Add GH key to known hosts
@@ -25,6 +27,9 @@ RUN apt-get update && \
     groupadd docker || true && \
     usermod -aG docker jenkins
 
+RUN curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+RUN chmod +x /usr/local/bin/docker-compose && docker-compose version
+
 # Install Python and pipx
 RUN apt-get update && \
     apt-get install -y --fix-broken python3 python3-pip python3-venv pipx && \
@@ -40,12 +45,6 @@ RUN mkdir -p $PIPX_HOME && \
     chmod -R 755 $PIPX_HOME && \
     chown -R jenkins:jenkins $PIPX_HOME
 
-# Copy the entrypoint script
-COPY jenkins/entrypoint.sh /usr/local/bin/entrypoint.sh
-
-# Make the script executable
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 USER jenkins
 
 # Ensure pipx in PATH
@@ -54,7 +53,3 @@ RUN pipx ensurepath
 # Install Ansible
 RUN pipx install --include-deps ansible
 
-# Set the entrypoint
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-CMD ["/usr/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
