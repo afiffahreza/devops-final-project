@@ -29,7 +29,7 @@ pipeline {
     stage('Test') {
       steps {
         echo "Running tests"
-        sh 'mvn test | tee logs/mvn-test.log'
+        sh 'mvn verify jacoco:report | tee logs/mvn-test.log'
       }
     }
 
