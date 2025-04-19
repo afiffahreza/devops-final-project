@@ -371,7 +371,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "(vm_memory_total_max - vm_memory_total_used) / vm_memory_total_max * 100.0",
+          "expr": "100 - (vm_memory_heap_used / vm_memory_heap_max * 100)",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A",
@@ -1726,6 +1726,6 @@
   },
   "timezone": "browser",
   "title": "Jenkins: Performance and Health Overview",
-  "uid": "haryan-jenkins",
+  "uid": "leeroy-jenkins",
   "version": 1
 }

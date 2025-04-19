@@ -48,6 +48,14 @@ resource "aws_security_group" "pipeline_sg" {
   }
 
   ingress {
+    description = "Prometheus"
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     description = "Debug SSH"
     from_port   = 22
     to_port     = 22
